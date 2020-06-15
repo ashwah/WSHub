@@ -38,7 +38,7 @@ void I2c::scanAddresses()
 {
   Serial.println("Scanning...");
   for (byte address = MIN_ADDRESS; address < MAX_ADDRESS; ++address) {
-    if (_addresses[address]) {
+    if (_addresses[address] && !_has_new_weight && !_has_uuid_request) {
       this->processMessage(address);
     }
   }
@@ -82,7 +82,6 @@ void I2c::processMessage(int address) {
 
     //New weight data.
     if (code == '1') {
-      Serial.println(code);
       Serial.println("  *********************weight***********");
       _has_new_weight = true;
 
@@ -102,10 +101,8 @@ void I2c::processMessage(int address) {
       i = 0;
       Serial.print("    UUID : ");
       while(Wire.available() && i < UUID_LENGTH) {
-        //uuid[i] = Wire.read();
         c = Wire.read();
         uuid += c;
-        //Serial.print(uuid[i]);
         i++;
       }
 
@@ -121,9 +118,18 @@ void I2c::processMessage(int address) {
 
     // New device on i2c.
     if (code == '2') {
-      Serial.println(code);
       Serial.println("  *********************i2c handshake***********");
       this->acknowldge(address, '2');
+      return;
+    }
+
+
+    // UUID requested.
+    if (code == '3') {
+      _has_uuid_request = true;
+      _uuid_request_address = address;
+      Serial.println("  *********************uuid request***********");
+      /////
       return;
     }
 
@@ -141,6 +147,28 @@ bool I2c::hasNewWeight() {
   else {
     return false;
   }
+}
+
+bool I2c::hasUuidRequest() {
+  if (_has_uuid_request) {
+    _has_uuid_request = false;
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+void I2c::sendUuid(String uuid) {
+  Serial.print("  Sending UUID to ");
+  Serial.println(_uuid_request_address);
+  char code = 3;
+  Wire.beginTransmission(_uuid_request_address);
+  char buf[37];
+  uuid.toCharArray(buf, 37);
+  Wire.write("3");
+  Wire.write(buf);
+  Wire.endTransmission();
 }
 
 void I2c::acknowldge(int address, char code) {

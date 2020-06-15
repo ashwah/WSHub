@@ -4,7 +4,6 @@
 #include "Arduino.h"
 #include <Wire.h>
 
-
 class I2c
 {
   public:
@@ -14,7 +13,9 @@ class I2c
     void scanFull();
     void processMessage(int address);
     bool hasNewWeight();
+    bool hasUuidRequest();
     void acknowldge(int address, char code);
+    void sendUuid(String uuid);
 
   private:
     unsigned int _timer_a;
@@ -22,6 +23,8 @@ class I2c
     bool _addresses[127] = {};
     bool _has_new_weight;
     float _new_weight;
+    bool _has_uuid_request;
+    int _uuid_request_address;
 };
 
 #endif

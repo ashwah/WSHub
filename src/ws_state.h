@@ -5,6 +5,7 @@
 #include "led.h"
 #include "wifi_wrapper.h"
 #include "i2c.h"
+#include "api.h"
 
 class WsState
 {
@@ -16,11 +17,11 @@ class WsState
     Led led;
     WifiWrapper wifiWrapper;
     I2c i2c;
+    Api api;
 
   private:
-    enum State_enum {INIT, WAIT_WIFI, WAIT_I2C, READY, SENDING, ERROR_STATE};
+    enum State_enum {INIT, WAIT_WIFI, CHECK_API, WAIT_API, READY, SENDING, REQUESTING_UUID, ERROR_STATE};
     uint8_t _state;
-    // String _uuid;
     unsigned long _timer;
     bool _waiting = false;
 };
