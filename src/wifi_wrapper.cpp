@@ -31,7 +31,7 @@ bool WifiWrapper::autoConnect()
     //Local intialization. Once its business is done, there is no need to keep it around
     WiFiManager wifiManager;
     //reset saved settings
-    //wifiManager.resetSettings();
+    wifiManager.resetSettings();
 
     //set custom ip for portal
     //wifiManager.setAPStaticIPConfig(IPAddress(10,0,1,1), IPAddress(10,0,1,1), IPAddress(255,255,255,0));

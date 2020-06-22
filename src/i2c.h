@@ -13,6 +13,8 @@ class I2c
     void scanFull();
     void processMessage(int address);
     bool hasNewWeight();
+    String getNewWeight();
+    String getNewWeightUuid();
     bool hasUuidRequest();
     void acknowldge(int address, char code);
     void sendUuid(String uuid);
@@ -22,7 +24,8 @@ class I2c
     unsigned int _timer_f = -5000;
     bool _addresses[127] = {};
     bool _has_new_weight;
-    float _new_weight;
+    String _new_weight;
+    String _new_weight_uuid;
     bool _has_uuid_request;
     int _uuid_request_address;
 };

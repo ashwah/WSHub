@@ -31,7 +31,7 @@ void WsState::runState()
     case INIT:
       led.setColour(255, 64, 0);  // ?
       this->wait(2000, WAIT_WIFI);
-      Serial.println("WeightCore initalizing");
+      //Serial.println("WeightCore initalizing");
       break;
 
     case WAIT_WIFI:
@@ -79,7 +79,22 @@ void WsState::runState()
 
     case SENDING:
       led.blinkColour(255, 0, 255); // Purple
-      this->wait(4000, READY);
+      Serial.println("    WeightCore sending weight data.");
+      if (api.checkWifi()) {
+        if (api.checkApi()) {
+          api.postWeightData(i2c.getNewWeight(), i2c.getNewWeightUuid());
+          delay(1000);
+          _state = READY;
+        }
+        else {
+          // API says no!
+          _state = WAIT_API;
+        }
+      }
+      else {
+        // No wifi.
+        _state = WAIT_WIFI;
+      }
       break;
 
     case REQUESTING_UUID:

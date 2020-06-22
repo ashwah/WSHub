@@ -11,7 +11,7 @@ class Api
     bool checkWifi();
     bool checkApi();
     String getUuid();
-    void postWeightData(String uuid, String weight);
+    void postWeightData(String weight, String uuid);
 
   private:
     String _server;

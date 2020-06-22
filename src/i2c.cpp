@@ -37,7 +37,7 @@ void I2c::ready()
 void I2c::scanAddresses()
 {
   Serial.println("Scanning...");
-  for (byte address = MIN_ADDRESS; address < MAX_ADDRESS; ++address) {
+  for (byte address = MAX_ADDRESS; address >= MIN_ADDRESS; --address) {
     if (_addresses[address] && !_has_new_weight && !_has_uuid_request) {
       this->processMessage(address);
     }
@@ -48,7 +48,7 @@ void I2c::scanFull()
 {
   Serial.println("Scanning all addresses...");
 
-  for (byte address = MIN_ADDRESS; address < MAX_ADDRESS; ++address) {
+  for (byte address = MAX_ADDRESS; address >= MIN_ADDRESS; --address) {
     // Use the return value of
     // the Write.endTransmisstion to see if
     // a device did acknowledge to the address.
@@ -85,19 +85,21 @@ void I2c::processMessage(int address) {
       Serial.println("  *********************weight***********");
       _has_new_weight = true;
 
-      char weight[WEIGHT_LENGTH];
+      String weight;
+      char c;
       i = 0;
       Serial.print("    Weight : ");
       while(Wire.available() && i < WEIGHT_LENGTH) {
-        weight[i] = Wire.read();
-        Serial.print(weight[i]);
+        c = Wire.read();
+        weight += c;
         i++;
       }
-      Serial.println();
+
+      _new_weight = weight;
+      Serial.print(weight);
 
       //char uuid[UUID_LENGTH];
       String uuid;
-      char c;
       i = 0;
       Serial.print("    UUID : ");
       while(Wire.available() && i < UUID_LENGTH) {
@@ -106,6 +108,7 @@ void I2c::processMessage(int address) {
         i++;
       }
 
+      _new_weight_uuid = uuid;
       Serial.println(uuid);
 
       while(Wire.available()) {
@@ -147,6 +150,14 @@ bool I2c::hasNewWeight() {
   else {
     return false;
   }
+}
+
+String I2c::getNewWeight() {
+  return _new_weight;
+}
+
+String I2c::getNewWeightUuid() {
+  return _new_weight_uuid;  
 }
 
 bool I2c::hasUuidRequest() {

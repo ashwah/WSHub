@@ -12,8 +12,9 @@
 
 HTTPClient http;
 
-const String SERVER = "https://weight-see.herokuapp.com";
+const String SERVER = "http://161.35.39.145:5000";
 const String PATH_UUID = "/api/uuid";
+const String PATH_WEIGHT_DATA = "/api/weight-data";
 
 Api::Api()
 {
@@ -37,7 +38,33 @@ bool Api::checkApi()
 
   Serial.println(httpResponseCode);
 
+  http.end();
   return (httpResponseCode == 200);
+
+}
+
+void Api::postWeightData(String weight, String uuid)
+{
+  Serial.println("    Attempting post to API : ");
+  http.begin(SERVER + PATH_WEIGHT_DATA);
+  http.addHeader("Content-Type", "application/json");
+  String json = "{\"pod_uuid\":\"" + uuid + "\",\"weight_value\":\"" + weight + "\"}";
+  Serial.println(json);
+  int httpResponseCode = http.POST(json);
+
+  if (httpResponseCode == 200) {
+    //String payload = http.getString();
+    //payload.replace("\"", "");
+    Serial.print("    Posted to API : ");//Serial.println(payload);
+  }
+
+  else {
+    Serial.println("    Problem");
+  }
+  // Free resources
+  http.end();
+
+  return;
 
 }
 
@@ -51,6 +78,7 @@ String Api::getUuid()
     String payload = http.getString();
     payload.replace("\"", "");
     Serial.print("    From API : ");Serial.println(payload);
+    http.end();
     return payload;
   }
 
